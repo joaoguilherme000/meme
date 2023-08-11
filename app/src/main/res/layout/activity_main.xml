@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="sei la" />
+        android:text="sei l" />
 
     <TextView
         android:layout_width="wrap_content"
