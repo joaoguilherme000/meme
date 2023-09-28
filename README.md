@@ -1,1 +1,1 @@
-<span align="center"><h1>Nao deixe-o bravo</h1><picture align="center"><img align="end" height="400" width="380" src="https://github.com/joaoguilherme000/joaoguilherme000/blob/main/nada/gato.jpg" /></picture></span>
+<span align="center"><h1>Nao deixe-o bravo</h1><picture align="center"><img align="end" height="500" width="380" src="https://github.com/joaoguilherme000/joaoguilherme000/blob/main/nada/gato.jpg" /></picture></span>
