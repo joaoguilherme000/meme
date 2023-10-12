@@ -1,0 +1,46 @@
+import React, { useEffect, useState } from 'react';
+import { View, Image, ActivityIndicator, Text } from 'react-native';
+import { getDoc, doc } from 'firebase/firestore';
+import { db } from './../../../firebaseConfig'; // Importe seu arquivo de configuração do Firebase
+
+function ResultScreen({ route }) {
+  const { documentId } = route.params; // Receba o documentId como um parâmetro de rota
+  const [imageURL, setImageURL] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchImageURL = async () => {
+      try {
+        const docRef = doc(db, 'imagens', documentId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const url = docSnap.data().url;
+          setImageURL(url);
+        } else {
+          console.log('Documento não encontrado');
+        }
+      } catch (error) {
+        console.error('Erro ao recuperar a URL da imagem:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchImageURL();
+  }, [documentId]);
+
+  return (
+    <View>
+      {loading ? (
+        <ActivityIndicator />
+      ) : imageURL ? (
+        <Image source={{ uri: imageURL }} style={{ width: 200, height: 200 }} />
+      ) : (
+        <Text>Imagem não encontrada</Text>
+      )}
+    </View>
+  );
+}
+
+export default ResultScreen;
