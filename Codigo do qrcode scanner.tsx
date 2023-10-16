@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { Camera } from 'expo-camera';
 
 interface MeuProp {
@@ -8,8 +8,9 @@ interface MeuProp {
 }
 
 export default function QRCodeScanner() {
-  const [hasPermission, setHasPermission] = useState(null);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState<boolean>(false);
+  const [imageURL, setImageURL] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -21,8 +22,16 @@ export default function QRCodeScanner() {
   const handleBarCodeScanned = ({ type, data }: MeuProp) => {
     if (!scanned) {
       setScanned(true);
-      alert(`Link lido : ${type}\n\nDados: ${data}`);
+
+      if (type === 'QR_CODE' && data.startsWith('http')) {
+        // Se o código for um URL, mostre a imagem
+        setImageURL(data);
+      } else {
+        alert(`Tipo de código: ${type}\n\nDados: ${data}`);
+      }
+
       setTimeout(() => {
+        setImageURL(null);
         setScanned(false);
       }, 2000); // 2 seconds (adjust as needed)
     }
@@ -41,7 +50,10 @@ export default function QRCodeScanner() {
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={styles.camera}
       />
-      {scanned && <Text style={styles.text}>Escaneie um QR code novamente</Text>}
+      {imageURL && <Image source={{ uri: imageURL }} style={styles.image} />}
+      {scanned && !imageURL && (
+        <Text style={styles.text}>Escaneie um QR code novamente</Text>
+      )}
     </View>
   );
 }
@@ -58,5 +70,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 10,
     textAlign: 'center',
+  },
+  image: {
+    width: 200,
+    height: 200,
   },
 });
