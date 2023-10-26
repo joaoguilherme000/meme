@@ -1,14 +1,29 @@
-<h1>Tutorial</h1>
+# Tutorial
+
+- [Introdução](#introdução)
+- [Configuração da Câmera](#configuração-da-câmera)
+  - [Permissões](#permissões)
+  - [Dependências](#dependências)
+- [Código da Câmera](#código-da-câmera)
+  - [Importações](#importações)
+  - [Inicialização](#inicialização)
+  - [Upload](#upload)
 
 <h3> A unica biblioteca que foi usada é a camera o link ta ai em baixo, mesmo assim eu vou explicar cada linha e o porque dela existir.</h3>
 
  [REACT NATIVE VISION CAMERA](https://react-native-vision-camera.com/).
 
-<picture align="center"><img align="end" src="https://github.com/joaoguilherme000/meme/blob/master/captura%20native%20camera.png" /></picture>
+<picture align="center"><img align="end" src="https://github.com/joaoguilherme000/meme/blob/master/Meus/captura%20native%20camera.png" /></picture>
+
+## Introdução
 
 <h2>Os codigos da camera são feitos em varias partes pra ela funcionar</h2>
 
+## Configuração da Câmera
+
 <h3>A primeira coisa é a permissão e as dependencias, todos os codigos abaixo são pra isso</h3>
+
+### Permissões
 
 <h4>app/iprecoapp/ios/iprecoapp/Info.plist</h4>
 
@@ -27,6 +42,8 @@
     <...>
     <uses-permission android:name="android.permission.CAMERA" />
 ```
+
+### Dependências
 
 <h4>Baixar as dependencias</h4>
 
@@ -58,7 +75,7 @@
 "react-native-vision-camera": "^3.3.1"
 ```
 
-<h1>Agora vem o codigo: da camera</h1>
+## Código da Câmera
 
 <h4>app/iprecoapp/src/views/home/index.tsx</h4>
 
@@ -148,6 +165,7 @@ export default function Home () {
   )
 };
 ```
+### Importações
 
 <h2>Essas 3 primeiras linhas de codigo é a importanção das funções, componentes de outras bibliotecas</h2>
 
@@ -177,6 +195,8 @@ function MyComponent() {
 
 `import { db, storage } from "../../../firebaseConfig";` Aqui é a variavel do meu banco de dados db é o banco propriamente dito e o storage é onde fica as imagens;
 
+### Inicialização
+
 <h2>Começando o codigo</h2>
 
 `export default function Home () {` eu crio uma função que ja está sendo exportada
@@ -194,12 +214,12 @@ useEffect(() => {
     checkPermission();                   // ele checa a permissão toda vez que a pagina é carregada
   }, []);
 
-  const checkPermission = async () => {  // 
-    const newCameraPermission = await Camera.requestCameraPermission();
-    console.log(newCameraPermission); // mostra qual permissao foi concedida
+  const checkPermission = async () => {  // basicamente uma função assíncrona. recebe async porque ele espera a camera pedir permissão para que ela possa funcionar
+    const newCameraPermission = await Camera.requestCameraPermission(); // armazena numa constante qual permissão foi concendida
+    console.log(newCameraPermission); 	 // aqui ela mostra no console
   };
 
-  if (device == null) return(
+  if (device == null) return(            // se der errado ou a camera não funcionar ele mostra uma telinha
     <View style={Styles.container}>
       <Text style={{fontSize: 20, color:'black'}}>Carregando Camera...</Text>
       <ActivityIndicator size={'large'}/>
@@ -207,3 +227,45 @@ useEffect(() => {
 
   );
 ```
+### Upload
+
+```
+const tiraFoto = async () => {
+    if (camera.current != null) {
+      const photo = await camera.current.takePhoto(); // espera a camera tirar foto para colocar uma data nela
+      const response = await fetch(`file://${photo.path}`);
+      const blob = await response.blob();
+
+      const storageRef = ref(storage, `images/`);
+      const uploadTask = uploadBytesResumable(storageRef, blob);
+
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          // Acompanhe o progresso do upload aqui, se necessário
+        },
+        (error) => {
+          console.error('Erro no upload:', error);
+        },
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          console.log('URL da imagem:', downloadURL);
+
+          try {
+            const docRef = await addDoc(collection(db, 'imagens'), {
+              url: downloadURL, // Salva a URL da imagem no Firestore
+              createdAt: new Date().getTime(), // Adicione um carimbo de data/hora, se necessário
+            });
+
+            console.log('Documento salvo com sucesso', docRef.id);
+          } catch (e) {
+            console.error('Erro ao salvar no Firestore:', e);
+          }
+
+          setImageData(photo.path);
+        }
+      );
+    }
+  };
+```
+
