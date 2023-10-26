@@ -30,7 +30,7 @@
 
 ### Permissões
 
-<h4>app/iprecoapp/ios/iprecoapp/Info.plist</h4>
+[app/iprecoapp/ios/ipreco/Info.plist](https://github.com/G41h123/G41h123/blob/feature/camera/app/iprecoapp/ios/iprecoapp/Info.plist)
 
 ```
 <dict>
@@ -39,7 +39,7 @@
 ...
 ```
 
-<h4>app/iprecoapp/android/app/src/main/AndroidManifest.xml</h4>
+[app/iprecoapp/android/app/src/main/AndroidManifest.xml](https://github.com/G41h123/G41h123/blob/feature/camera/app/iprecoapp/android/app/src/main/AndroidManifest.xml)
 
 ```
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -54,7 +54,7 @@
 
 `npm i react-native-vision-camera`
 
-<h4>app/iprecoapp/package-lock.json</h4>
+[app/iprecoapp/package-lock.json](https://github.com/G41h123/G41h123/blob/feature/camera/app/iprecoapp/package-lock.json)
 
 ```
 "node_modules/react-native-vision-camera": {
@@ -74,7 +74,7 @@
     },
 ```
 
-<h4>app/iprecoapp/package.json</h4>
+[app/iprecoapp/package.json](https://github.com/G41h123/G41h123/blob/feature/camera/app/iprecoapp/package.json)
 
 ```
 "react-native-vision-camera": "^3.3.1"
@@ -82,7 +82,7 @@
 
 ## Código da Câmera
 
-<h4>app/iprecoapp/src/views/home/index.tsx</h4>
+[app/iprecoapp/src/views/home/index.tsx](https://github.com/G41h123/G41h123/blob/feature/camera/app/iprecoapp/src/views/home/index.tsx)
 
 ```
 import React, { useEffect, useRef, useState } from 'react';
@@ -341,4 +341,52 @@ return (
   )
 ```
 
-Neste trecho de código, a função *(home)* está retornando elementos do React Native para serem renderizados na tela. Uma View que organiza outros componentes em coluno e com espaçamento de 5, um componente de câmera, um botão "Tirar Foto" e estilos.
+Neste trecho de código, a função **(home)** está retornando elementos do React Native para serem renderizados na tela. Uma View que organiza outros componentes em coluno e com espaçamento de 5, um componente de câmera, um botão "Tirar Foto" e estilos.
+
+## Estilo 
+
+[app/iprecoapp/src/views/home/Style.tsx](https://github.com/G41h123/G41h123/blob/feature/camera/app/iprecoapp/src/views/home/Style.tsx)
+
+```
+import { StyleSheet } from 'react-native';
+
+const Styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: 'center'
+  },
+  camera: {
+    width: "auto",
+    height: "92%"
+  },
+  button: {
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    backgroundColor: '#f4a100',
+    alignSelf: 'center',
+    height: '7%', 
+    width: "90%",
+    borderRadius: 10,
+  },
+  image: {
+    width: '100%',
+  },
+});
+
+export default Styles;
+```
+
+<h3>
+<ol>
+  <li>Importação: cria uma paleta de cores, componente do react-native </li>
+  <li>Cria uma variavel estilos que tem a função da paleta de cores</li>
+  <li>Ela recebe:</li>
+    <ol>
+      <li>Nome da classe</li>
+      <li>Propriedades css</li>
+    </ol>
+  <li>Exportação</li>
+</ol>
+</h3>
