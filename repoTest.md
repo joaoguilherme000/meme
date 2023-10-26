@@ -1,5 +1,8 @@
 # Tutorial
 
+```diff
+- ATENÇÃO O CODIGO PODE E VAI SER MELHORADO!
+```
 - [Introdução](#introdução)
 - [Configuração da Câmera](#configuração-da-câmera)
   - [Permissões](#permissões)
@@ -8,6 +11,8 @@
   - [Importações](#importações)
   - [Inicialização](#inicialização)
   - [Upload](#upload)
+  - [Progresso do upload](#progresso-do-upload)
+- [Tela](#tela)
 
 <h3> A unica biblioteca que foi usada é a camera o link ta ai em baixo, mesmo assim eu vou explicar cada linha e o porque dela existir.</h3>
 
@@ -189,20 +194,25 @@ function MyComponent() {
 
 <h2>Aqui é a importação das funções/API do banco de dados</h2>
 
-`import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";` função uploadBytesResumable API do Storage. faz o upload de dados para o armazenamento do Firebase de maneira resumível, o que significa que, se a conexão com a internet for perdida durante o upload, ele pode retornar a partir do ponto em que foi interrompido, em vez de começar do zero. função getDownloadURL permite obter a URL de download de um arquivo que foi previamente enviado para o Firebase Storage.
+```
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
-`import { addDoc, collection} from "firebase/firestore";` O collection é usado para acessar ou criar uma coleção no Firestore, e o addDoc é usado para adicionar um novo documento a essa coleção. Ambas as funções são parte da API do Firestore e são usadas para realizar operações de leitura e escrita em seu banco de dados NoSQL em tempo real.
+import { addDoc, collection} from "firebase/firestore"; 
 
-`import { db, storage } from "../../../firebaseConfig";` Aqui é a variavel do meu banco de dados db é o banco propriamente dito e o storage é onde fica as imagens;
+import { db, storage } from "../../../firebaseConfig";
+```
+
+Função uploadBytesResumable API do Storage (explicado no ~#upload~). função getDownloadURL permite obter a URL de download de um arquivo que foi previamente enviado para o Firebase Storage.
+
+O collection é usado para acessar ou criar uma coleção no Firestore, e o addDoc é usado para adicionar um novo documento a essa coleção. Ambas as funções são parte da API do Firestore e são usadas para realizar operações de leitura e escrita em seu banco de dados NoSQL em tempo real.
+
+A variavel do meu banco de dados db é o banco propriamente dito e o storage é onde fica as imagens;
 
 ### Inicialização
 
-<h2>Começando o codigo</h2>
-
-`export default function Home () {` eu crio uma função que ja está sendo exportada
-
 ```
-const device = useCameraDevice('back')                    // eu crio uma variavel que recebe a camera(principal) de tras.
+export default function Home () {			  // crio uma função que ja está sendo exportada
+  const device = useCameraDevice('back')                    // eu crio uma variavel que recebe a camera (principal) de tras.
   const camera = useRef<Camera | null>(null);             // aqui eu referencio a camera para user ela atualmente
   const [imageData, setImageData] = useState<string>(''); // aqui a imagem que foi tirada pelo usuario ficar armazenada na imageData como uma string
 ```
@@ -269,3 +279,66 @@ const tiraFoto = async () => {
   };
 ```
 
+Como a câmera é configurada no aplicativo. Primeiro, verificamos se a câmera está disponível. Se houver uma câmera disponível (a de tras), criamos uma variável que aguarda a foto que o usuário tirou. Em seguida, criamos outra variável para buscar a foto que o usuário capturou (fica no cache do app).
+
+Agora, vamos entrar em mais detalhes sobre como fazemos isso. Utilizamos uma função chamada `fetch`, que é uma poderosa ferramenta para fazer **solicitações de rede**. Ela nos permite buscar recursos, como arquivos ou dados, de várias fontes. No nosso caso, estamos usando `fetch` para obter a foto que o usuário tirou.
+
+Mas o que acontece depois? A resposta obtida com o fetch é tratada com o método `response.blob()`. Esse método faz parte do objeto de resposta e é usado para extrair e transformar o conteúdo da resposta em um objeto do tipo `Blob`. Um Blob é uma imagem.
+
+Então o codigo pega a foto que o usuario tirou e transforma numa variavel blob tudo isso em sequência com a `await` que espera uma função pra começar outra de baixo.
+
+```
+const storageRef = ref(storage, 'images/'); 		    // Aqui, estamos criando uma referência ao local onde a imagem será armazenada no Firebase Storage.
+const uploadTask = uploadBytesResumable(storageRef, blob);  // Inicia o upload da imagem para o Firebase Storage de maneira resumível, se houver interrupções na conexão de rede, o upload de ser retomado
+```
+
+### Progresso do upload
+
+```
+ uploadTask.on(						// o processo de upload é Iniciado
+        'state_changed',
+        (snapshot) => { // Ignore				
+        },
+        (error) => {				     	// pega o erro e mostra
+          console.error('Erro no upload:', error);
+        },
+        async () => { 					// cria uma variavel pra poder mostrar aonde essa imagem foi
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          console.log('URL da imagem:', downloadURL);
+
+          try {						// Ele pega a referencia do documento que se chamar 'imagens' e coloca a url la junto com a data
+            const docRef = await addDoc(collection(db, 'imagens'), {
+              url: downloadURL, // Salva a URL da imagem no Firestore
+              createdAt: new Date().getTime(), // Adicione um carimbo de data/hora, se necessário
+            });
+							// Se tentou e conseguiu ele mostra no console junto com o id do documento
+            console.log('Documento salvo com sucesso', docRef.id);
+          } catch (e) {
+            console.error('Erro ao salvar no Firestore:', e);
+          }
+
+          setImageData(photo.path);			// Eu mudo a variavel da imagem pra mim mostrar na tela de resultados
+        }
+      );
+```
+
+## Tela
+
+```
+return (
+    <View style={{flex: 1, flexDirection: 'column',gap: 5}}>
+      <Camera
+        ref={camera}
+        style={Styles.camera}
+        device={device}
+        isActive={true}
+        photo
+      />
+      <TouchableOpacity style={Styles.button} onPress={tiraFoto}>
+        <Text style={{fontSize: 20, color:'black'}}>Tirar Foto</Text>
+      </TouchableOpacity>
+    </View>
+  )
+```
+
+Neste trecho de código, a função *(home)* está retornando elementos do React Native para serem renderizados na tela. Uma View que organiza outros componentes em coluno e com espaçamento de 5, um componente de câmera, um botão "Tirar Foto" e estilos.
