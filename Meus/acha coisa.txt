@@ -1,3 +1,5 @@
 sites:drive.google.com pequeno principe pdf
 
 https://drive.google.com/file/d/1GP9gpt-3dVgeSMtMHpYKGvTaB6aflslh/view
+
+file:///C:/Users/Aluno/Downloads/Vade_mecum_2023.pdf
