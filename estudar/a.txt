@@ -1,0 +1,4 @@
+Anotações: Sistema de aviso inicial => O projeto Honeynet, Compartilhamento de inteligencia => o programa Infragard, Normas ISM => ISO/IEC 27000, Novas leis => Cybersecurity Act, Banco de dados de vulnerabilidade => O projeto nacional Vulnerabilidade e exposições comuns (CVE).
+
+Qual é o nome dado a um hacker amador? hacker inexperiente
+
